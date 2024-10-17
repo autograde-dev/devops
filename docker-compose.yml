@@ -6,7 +6,8 @@ services:
     container_name: traefik
     ports:
       - "80:80"
-      - "443:443"
+      - "8080:8080"
+      - "443:443"      
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./traefik/traefik.yml:/traefik.yml
@@ -82,7 +83,7 @@ services:
       #KEYCLOAK_FRONTEND_URL: ${KEYCLOAK_FRONTEND_URL}
 
     ports:
-      - "8080:8080"
+      - "8081:8080"
     networks:
       - autograde-network
     depends_on:
