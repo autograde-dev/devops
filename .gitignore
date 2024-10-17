@@ -1,0 +1,25 @@
+# Ignorar los volúmenes de Docker
+/db_data
+/minio_data
+/traefik_data
+
+# Ignorar archivos de configuración y logs de Docker
+docker-compose.override.yml
+docker-compose.local.yml
+*.log
+*.tmp
+
+# Ignorar contenedores y configuraciones específicas del sistema operativo
+node_modules/
+.DS_Store
+*.swp
+
+# Ignorar archivos de compilación o temporales
+*.bak
+*.cache
+*.pid
+*.lock
+
+# Ignorar archivos relacionados con IDEs y editores
+.vscode/
+.idea/
