@@ -2,11 +2,12 @@ version: "1.0"
 
 services:
   traefik:
-    image: traefik:v3.0.0
+    image: traefik:v3.1
     container_name: traefik
     ports:
       - "80:80"
-      - "443:443"
+      - "8080:8080"
+      - "443:443"      
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./traefik/traefik.yml:/traefik.yml
@@ -18,15 +19,19 @@ services:
       - --entryPoints.web.address=:80
       - --entryPoints.websecure.address=:443
 
-  db:
+  postgres:
     image: postgres:16
     container_name: postgres
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - ./db_data:/var/lib/postgresql/data
+      - ./docker-compose/pgsql:/docker-entrypoint-initdb.d
+
     networks:
       - autograde-network
     healthcheck:
@@ -35,7 +40,7 @@ services:
       retries: 5
 
   rabbitmq:
-    image: rabbitmq:3.12-management
+    image: rabbitmq:4.0.0-management
     container_name: rabbitmq
     ports:
       - "15672:15672"
@@ -47,7 +52,7 @@ services:
       - autograde-network
 
   minio:
-    image:  minio/minio
+    image:  quay.io/minio/minio
     container_name: minio
     ports:
       - "9000:9000"
@@ -62,23 +67,29 @@ services:
       - autograde-network
 
   keycloak:
-    image: quay.io/keycloak/keycloak:22.0.0
+    image: quay.io/keycloak/keycloak:26.0.0
     container_name: keycloak
     environment:
-      KEYCLOAK_USER: ${KEYCLOAK_USER}
-      KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
-      DB_VENDOR: POSTGRES
-      DB_ADDR: db
-      DB_DATABASE: ${POSTGRES_DB}
+      DB_VENDOT: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABSE: ${POSTGRES_DB}
       DB_USER: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
+      #KC_HOSTNAME_URL: ${KC_HOSTNAME_URL}
+      #KC_HOSTNAME_STRICT_HTTPS: "true"
+      #KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
+      #KC_PROXY: edge
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_USER}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      #KEYCLOAK_FRONTEND_URL: ${KEYCLOAK_FRONTEND_URL}
     ports:
-      - "8080:8080"
+      - "8081:8080"
     networks:
       - autograde-network
     depends_on:
-      - db
-
+      - postgres
+    command:
+      - start-dev
 networks:
   autograde-network:
     driver: bridge
