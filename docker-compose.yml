@@ -138,16 +138,14 @@ services:
       - autograde-network
   
   notification:
-    image: hudson94/autograde-dev-notification:latest
-    ports:
-      - "8080:8080"
-    profiles: ["node1"]
+    image: hudson94/autograde-dev-notification
     depends_on:
       - rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
       RABBITMQ_HOST: rabbitmq
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
     networks:
       - autograde-network
     container_name: notification
@@ -164,7 +162,9 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      JWT_ISSUER_URI: ${JWT_ISSUER_URI}    
+      JWT_ISSUER_URI: ${JWT_ISSUER_URI}
+    networks:
+      - autograde-network   
 
   docentes-es:
     image: oepaezb/docentes:latest
@@ -178,7 +178,9 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      JWT_ISSUER_URI: ${JWT_ISSUER_URI}      
+      JWT_ISSUER_URI: ${JWT_ISSUER_URI}
+    networks:
+      - autograde-network     
   
   auth-us:
     image: oepaezb/auth:latest
@@ -192,9 +194,10 @@ services:
       LOGGIN_LEVEL_KEYCLOAK: ${LOGGIN_LEVEL_KEYCLOAK}
       RESOURCE_ID: ${RESOURCE_ID}
       PRINCIPLE_ATTRIBUTE: ${PRINCIPLE_ATTRIBUTE}
+    networks:
+      - autograde-network
 
-  apievaluacion:
-    profiles: ["node1"]
+apievaluacion:
     container_name: api-evaluacion
     env_file: .env
     environment:
@@ -204,7 +207,7 @@ services:
       - postgres
     ports:
       - "5000:5000"
-    image: lkranl/autograde-dev-apievaluacion:latest
+    image: lkranl/autograde-dev-apievaluacion:0.1
     networks:
       - autograde-network
 
