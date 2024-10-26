@@ -93,8 +93,6 @@ services:
       
   notification:
     image: hudson94/autograde-dev-notification
-    ports:
-      - "8080:8080"
     depends_on:
       - rabbitmq
     environment:
