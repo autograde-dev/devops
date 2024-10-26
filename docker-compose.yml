@@ -149,6 +149,7 @@ services:
   
   notification:
     image: hudson94/autograde-dev-notification
+    profiles: ["node1"]
     depends_on:
       - rabbitmq
     environment:
@@ -163,7 +164,8 @@ services:
   estudiantes-es:
     image: oepaezb/estudiantes:latest
     container_name: estudiantes-es
-    ports: "8085:8080"
+    ports: 
+      - "8085:8080"
     profiles: ["node1"]
     depends_on:
       - postgres
@@ -179,7 +181,8 @@ services:
   docentes-es:
     image: oepaezb/docentes:latest
     container_name: docentes-es
-    ports: "8084:8080"
+    ports: 
+      - "8084:8080"
     profiles: ["node1"]
     depends_on:
       - postgres
@@ -195,7 +198,8 @@ services:
   auth-us:
     image: oepaezb/auth:latest
     profiles: ["node1"]
-    ports: "8083:8080"
+    ports: 
+      - "8083:8080"
     container_name: auth-us
     environment:
       IP_DATABASE: ${IP_DATABASE}
@@ -207,8 +211,9 @@ services:
     networks:
       - autograde-network
 
-apievaluacion:
+  apievaluacion:
     container_name: api-evaluacion
+    profiles: ["node1"]    
     env_file: .env
     environment:
       RABBITMQ_HOST: rabbitmq
