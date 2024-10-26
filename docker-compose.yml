@@ -93,14 +93,13 @@ services:
       
   notification:
     image: hudson94/autograde-dev-notification
-    ports:
-      - "8080:8080"
     depends_on:
       - rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
       RABBITMQ_HOST: rabbitmq
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
     networks:
       - autograde-network
     container_name: notification
