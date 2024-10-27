@@ -89,27 +89,26 @@ services:
     image: quay.io/keycloak/keycloak:26.0.1
     container_name: keycloak
     profiles: ["node3"]
+    restart: always
     environment:
-      DB_VENDOR: POSTGRES
-      DB_ADDR: postgres
-      DB_DATABSE: ${POSTGRES_DB}
-      DB_USER: ${POSTGRES_USER}
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
-      KC_HOSTNAME_URL: ${KC_HOSTNAME_URL}
-      #KC_HOSTNAME_STRICT_HTTPS: "true"
-      #KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
+      # Configuración de la base de datos externa
+      KC_DB: postgres
+      KC_DB_URL_HOST: ${KC_DB_URL_HOST}
+      KC_DB_URL_PORT: ${KC_DB_URL_PORT}
+      KC_DB_URL_DATABASE: ${POSTGRES_DB}
+      KC_DB_USERNAME: ${POSTGRES_USER}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}    
+      # Configuración de Keycloak
+      KC_HOSTNAME: ${KC_HOSTNAME}
       KC_PROXY: edge
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_USER}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
-      #KEYCLOAK_FRONTEND_URL: ${KEYCLOAK_FRONTEND_URL
     ports:
       - "9090:8080"
     volumes:
       - /docker-compose/keycloak/import:/opt/keycloak/data/import
     networks:
       - autograde-network
-    depends_on:
-      - postgres
     command:
       - start-dev --import-realm
       - --http-enabled=true
@@ -138,7 +137,8 @@ services:
       - autograde-network
   
   notification:
-    image: hudson94/autograde-dev-notification
+    image: hudson94/autograde-dev-notification:latest
+    profiles: ["node1"]
     depends_on:
       - rabbitmq
     environment:
@@ -197,8 +197,9 @@ services:
     networks:
       - autograde-network
 
-apievaluacion:
+  apievaluacion:
     container_name: api-evaluacion
+    profiles: ["node1"]
     env_file: .env
     environment:
       RABBITMQ_HOST: rabbitmq
@@ -207,7 +208,7 @@ apievaluacion:
       - postgres
     ports:
       - "5000:5000"
-    image: lkranl/autograde-dev-apievaluacion:0.1
+    image: lkranl/autograde-dev-apievaluacion:latest
     networks:
       - autograde-network
 
