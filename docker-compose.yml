@@ -128,11 +128,21 @@ services:
     image: jhonm8a/go-worker-evaluation:latest
     container_name: go-worker-evaluation
     ports:
-      - "8081:8081"
+      - "8082:8081"
     profiles: ["node1"]
     environment:     
       MAX_WORKERS: ${MAX_WORKERS}
       MAX_QUEUE: ${MAX_QUEUE}
+      PORT: ":8081"
+      MINIO_ENDPOINT: "minio:9000"
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_USE_SSL: "false"
+      RABBITMQ_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_PASS: ${RABBITMQ_DEFAULT_PASS}
+      RABBITMQ_HOST: "rabbitmq"
+      RABBITMQ_PORT: "5672"
+      RABBITMQ_QUEUE_NAME_EVA: "notification"      
     networks:
       - autograde-network
   
@@ -153,7 +163,8 @@ services:
   estudiantes-es:
     image: oepaezb/estudiantes:latest
     container_name: estudiantes-es
-    ports: "8085:8080"
+    ports: 
+      - "8085:8080"
     profiles: ["node1"]
     depends_on:
       - postgres
@@ -169,7 +180,8 @@ services:
   docentes-es:
     image: oepaezb/docentes:latest
     container_name: docentes-es
-    ports: "8084:8080"
+    ports: 
+      - "8084:8080"
     profiles: ["node1"]
     depends_on:
       - postgres
@@ -185,7 +197,8 @@ services:
   auth-us:
     image: oepaezb/auth:latest
     profiles: ["node1"]
-    ports: "8083:8080"
+    ports: 
+      - "8083:8080"
     container_name: auth-us
     environment:
       IP_DATABASE: ${IP_DATABASE}
