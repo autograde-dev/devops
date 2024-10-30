@@ -1,29 +1,34 @@
 version: "1.0"
 
+x-common-labels: &common-labels
+  labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.common.entrypoints=web"
+    - "traefik.http.routers.backend.rule=Host(`api.autograde.dev`)"
+
 services:
   traefik:
     image: traefik:v3.1
     container_name: traefik
+    restart: always
     ports:
       - "80:80"
       - "8081:8080"
-      - "443:443"
     profiles: ["node2"]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /docker-compose/traefik.yml:/traefik.yml
+      - ./docker-compose/traefik/traefik.yml:/etc/traefik/traefik.yml
+      - ./docker-compose/traefik/conf.d:/etc/traefik/conf.d
     networks:
       - autograde-network
     command:
       - --api.insecure=true
-      - --providers.docker
+      - --providers.file.directory=/docker-compose/traefik/conf.d
       - --entryPoints.web.address=:80
-      - --entryPoints.websecure.address=:443
+      - --log.level=DEBUG
+      - --api.dashboard=true
       - --accesslog
     labels:
-      - "traefik.http.routers.api.rule=Host(`s3.autograde.dev`)"
-      - "traefik.http.routers.api.entrypoints=websecure"
-      - "traefik.http.routers.api.tls=true"
       - "traefik.http.routers.api.middlewares=jwt-auth"
       - "traefik.http.middlewares.jwt-auth.forwardauth.address=http://172.16.8.212:9090/realms/spring-boot-realm-dev/protocol/openid-connect/token"
       - "traefik.http.middlewares.jwt-auth.forwardauth.authResponseHeaders=Authorization"
@@ -84,6 +89,10 @@ services:
     command: server --console-address ":9001" /data
     networks:
       - autograde-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.minio.rule=Host(`${MINIO_DOMAIN}`)"
+      - "traefik.http.routers.minio.entrypoints=web"
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.0.1
@@ -112,6 +121,10 @@ services:
     command:
       - start-dev --import-realm
       - --http-enabled=true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth.rule=Host(`${KEYCLOAK_DOMAIN}`)"
+      - "traefik.http.routers.auth.entrypoints=web"
   
   nginx:
     image: nginx:latest
@@ -145,6 +158,7 @@ services:
       RABBITMQ_QUEUE_NAME_EVA: "notification"      
     networks:
       - autograde-network
+    <<: *common-labels
   
   notification:
     image: hudson94/autograde-dev-notification:latest
@@ -159,6 +173,7 @@ services:
     networks:
       - autograde-network
     container_name: notification
+    <<: *common-labels
 
   estudiantes-es:
     image: oepaezb/estudiantes:latest
@@ -176,6 +191,7 @@ services:
       JWT_ISSUER_URI: ${JWT_ISSUER_URI}
     networks:
       - autograde-network   
+    <<: *common-labels
 
   docentes-es:
     image: oepaezb/docentes:latest
@@ -192,7 +208,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       JWT_ISSUER_URI: ${JWT_ISSUER_URI}
     networks:
-      - autograde-network     
+      - autograde-network
+    <<: *common-labels
   
   auth-us:
     image: oepaezb/auth:latest
@@ -209,6 +226,7 @@ services:
       PRINCIPLE_ATTRIBUTE: ${PRINCIPLE_ATTRIBUTE}
     networks:
       - autograde-network
+    <<: *common-labels
 
   apievaluacion:
     container_name: api-evaluacion
@@ -224,7 +242,7 @@ services:
     image: lkranl/autograde-dev-apievaluacion:latest
     networks:
       - autograde-network
-
+    <<: *common-labels
 
 networks:
   autograde-network:

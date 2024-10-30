@@ -1,0 +1,61 @@
+http:
+  routers:
+    minio-router:
+      rule: "Host(`s3.autograde.dev`)"
+      service: minio-service
+      entryPoints:
+        - web
+
+    minioconsole-router:
+      rule: "Host(`s3-console.autograde.dev`)"
+      service: minioconsole-service
+      entryPoints:
+        - web
+
+    traefikautograde-router:
+      rule: "Host(`app.autograde.dev`,`api.autograde.dev`,`auth.autograde.dev`,`s3.autograde.dev`,`exams.autograde.dev`)"
+      service: traefikautograde-service
+      entryPoints:
+        - web
+
+  services:
+    minio-service:
+      loadBalancer:
+        servers:
+          - url: "http://172.16.8.212:9000"
+    minioconsole-service:
+      loadBalancer:
+        servers:
+          - url: "http://172.16.8.212:9001"
+    traefikautograde-service:
+      loadBalancer:
+        servers:
+          - url: "http://172.16.8.211:8081"
+    exams-service:
+      loadBalancer:
+        servers:
+          - url: "http://172.16.8.211:80"
+    auth-service:
+      loadBalancer:
+        servers:
+          - url: "http://172.16.8.212:9090"
+    go-worker-evaluation:
+      loadBalancer:
+        servers:
+          - url: "http://172.16.8.210:8082"
+    estudiantes-es:
+      loadBalancer:
+        servers:
+          - url: "http://172.16.8.210:8085"
+    docentes-es:
+      loadBalancer:
+        servers:
+          - url: "http://172.16.8.210:8084"
+    auth-us:
+      loadBalancer:
+        servers:
+          - url: "http://172.16.8.210:8083"
+    apievaluacion:
+      loadBalancer:
+        servers:
+          - url: "http://172.16.8.210:5000"
