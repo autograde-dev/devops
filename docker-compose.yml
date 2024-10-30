@@ -157,7 +157,11 @@ services:
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
       RABBITMQ_HOST: rabbitmq
       SENDGRID_API_KEY: ${SENDGRID_API_KEY}
-      RABBITMQ_QUEUE_NAME_EVA: "notification" 
+      RABBITMQ_QUEUE_NAME_EVA: "notifications" 
+      SMTP_SERVER: ${SMTP_SERVER}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
       RUN_TEST: false
     networks:
       - autograde-network
