@@ -156,6 +156,8 @@ services:
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
       RABBITMQ_HOST: rabbitmq
       SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+      RABBITMQ_QUEUE_NAME_EVA: "notification" 
+      RUN_TEST: false
     networks:
       - autograde-network
     container_name: notification
