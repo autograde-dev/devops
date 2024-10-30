@@ -40,11 +40,11 @@ http:
       service: apievaluacion-service
       entryPoints:
         - web      
-    traefikautograde-router:
-      rule: "Host(`app.autograde.dev`,`api.autograde.dev`,`auth.autograde.dev`,`s3.autograde.dev`,`exams.autograde.dev`,`s3-console.autograde.dev`)"
-      service: traefikautograde-service
-      entryPoints:
-        - web
+#    traefikautograde-router:
+#      rule: "Host(`app.autograde.dev`,`api.autograde.dev`,`auth.autograde.dev`,`s3.autograde.dev`,`exams.autograde.dev`,`s3-console.autograde.dev`)"
+#      service: traefikautograde-service
+#      entryPoints:
+#        - web
 
 
   services:
@@ -52,10 +52,10 @@ http:
       loadBalancer:
         servers:
           - url: "http://172.16.8.212:9090"
-    traefikautograde-service:
-      loadBalancer:
-        servers:
-          - url: "http://172.16.8.211:8081"
+#    traefikautograde-service:
+#      loadBalancer:
+#        servers:
+#          - url: "http://172.16.8.211:8081"
     rabbitmq-gui-service:
       loadBalancer:
         servers:
