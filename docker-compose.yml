@@ -52,11 +52,10 @@ services:
     container_name: rabbitmq
     ports:
       - "15672:15672"
-      - "5673:5672"
+      - "5672:5672"
     profiles: ["node1"]
     environment:
       RABBITMQ_QUEUE_NAME_EVA: notification
-      RABBITMQ_HOST: host.docker.internal
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
     volumes:
@@ -109,7 +108,8 @@ services:
     networks:
       - autograde-network
     command:
-      - start-dev --import-realm
+      - "start-dev"
+      - "--import-realm"
       - --http-enabled=true
     labels:
       - "traefik.enable=true"
@@ -164,7 +164,7 @@ services:
     container_name: notification
 
   estudiantes-es:
-    image: oepaezb/estudiantes:latest
+    image: oepaezb/estudiantes:version11
     container_name: estudiantes-es
     ports: 
       - "8085:8080"
@@ -181,7 +181,7 @@ services:
       - autograde-network   
 
   docentes-es:
-    image: oepaezb/docentes:latest
+    image: oepaezb/docentes:version11
     container_name: docentes-es
     ports: 
       - "8084:8080"
@@ -198,13 +198,12 @@ services:
       - autograde-network
   
   auth-us:
-    image: oepaezb/auth:latest
+    image: oepaezb/auth:version12
     profiles: ["node1"]
     ports: 
       - "8083:8080"
     container_name: auth-us
     environment:
-      IP_DATABASE: ${IP_DATABASE}
       JWT_ISSUER_URI: ${JWT_ISSUER_URI}
       JWT_SET_URI: ${JWT_SET_URI}
       LOGGIN_LEVEL_KEYCLOAK: ${LOGGIN_LEVEL_KEYCLOAK}
