@@ -1,11 +1,5 @@
 version: "1.0"
 
-x-common-labels: &common-labels
-  labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.common.entrypoints=web"
-    - "traefik.http.routers.backend.rule=Host(`api.autograde.dev`)"
-
 services:
   traefik:
     image: traefik:v3.1
@@ -89,10 +83,6 @@ services:
     command: server --console-address ":9001" /data
     networks:
       - autograde-network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.minio.rule=Host(`${MINIO_DOMAIN}`)"
-      - "traefik.http.routers.minio.entrypoints=web"
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.0.1
@@ -126,14 +116,12 @@ services:
       - "traefik.http.routers.auth.rule=Host(`${KEYCLOAK_DOMAIN}`)"
       - "traefik.http.routers.auth.entrypoints=web"
   
-  nginx:
-    image: nginx:latest
-    container_name: nginx
+  front:
+    image: andres207/autograde-dev:latest
+    container_name: front
     ports:
-      - "8080:80"
+      - "8089:80"
     profiles: ["node2"]
-    volumes:
-      - ./docker-compose/nginx:/usr/share/nginx/html
     networks:
       - autograde-network
 
@@ -158,7 +146,6 @@ services:
       RABBITMQ_QUEUE_NAME_EVA: "notifications"      
     networks:
       - autograde-network
-    <<: *common-labels
   
   notification:
     image: hudson94/autograde-dev-notification:latest
@@ -175,7 +162,6 @@ services:
     networks:
       - autograde-network
     container_name: notification
-    <<: *common-labels
 
   estudiantes-es:
     image: oepaezb/estudiantes:latest
@@ -193,7 +179,6 @@ services:
       JWT_ISSUER_URI: ${JWT_ISSUER_URI}
     networks:
       - autograde-network   
-    <<: *common-labels
 
   docentes-es:
     image: oepaezb/docentes:latest
@@ -211,7 +196,6 @@ services:
       JWT_ISSUER_URI: ${JWT_ISSUER_URI}
     networks:
       - autograde-network
-    <<: *common-labels
   
   auth-us:
     image: oepaezb/auth:latest
@@ -228,7 +212,6 @@ services:
       PRINCIPLE_ATTRIBUTE: ${PRINCIPLE_ATTRIBUTE}
     networks:
       - autograde-network
-    <<: *common-labels
 
   apievaluacion:
     container_name: api-evaluacion
@@ -244,7 +227,6 @@ services:
     image: lkranl/autograde-dev-apievaluacion:latest
     networks:
       - autograde-network
-    <<: *common-labels
 
 networks:
   autograde-network:

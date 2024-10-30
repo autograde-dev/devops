@@ -1,61 +1,86 @@
 http:
   routers:
-    minio-router:
-      rule: "Host(`s3.autograde.dev`)"
-      service: minio-service
+    keycloak-router:
+      rule: "Host(`auth.autograde.dev`)"
+      service: keycloak-service
       entryPoints:
         - web
-
-    minioconsole-router:
-      rule: "Host(`s3-console.autograde.dev`)"
-      service: minioconsole-service
+    front-router:
+      rule: "Host(`app.autograde.dev`)"
+      service: front-service
       entryPoints:
         - web
-
+    rabbitmq-gui-router:
+      rule: "Host(`api.autograde.dev`) && Path(`/queue-gui`)"
+      service: rabbitmq-gui-service
+      entryPoints:
+        - web
+    go-worker-router:
+      rule: "Host(`api.autograde.dev`) && Path(`/worker-evaluation`)"
+      service: go-worker-evaluation-service
+      entryPoints:
+        - web
+    estudiantes-router:
+      rule: "Host(`api.autograde.dev`) && Path(`/estudiantes-es`)"
+      service: estudiantes-service
+      entryPoints:
+        - web
+    docentes-router:
+      rule: "Host(`api.autograde.dev`) && Path(`/docentes-es`)"
+      service: docentes-service
+      entryPoints:
+        - web
+    auth-utility-router:
+      rule: "Host(`api.autograde.dev`) && Path(`/auth-us`)"
+      service: auth-utility-service
+      entryPoints:
+        - web
+    apievaluacion-router:
+      rule: "Host(`api.autograde.dev`) && Path(`/apievaluacion`)"
+      service: apievaluacion-service
+      entryPoints:
+        - web      
     traefikautograde-router:
-      rule: "Host(`app.autograde.dev`,`api.autograde.dev`,`auth.autograde.dev`,`s3.autograde.dev`,`exams.autograde.dev`)"
+      rule: "Host(`app.autograde.dev`,`api.autograde.dev`,`auth.autograde.dev`,`s3.autograde.dev`,`exams.autograde.dev`,`s3-console.autograde.dev`)"
       service: traefikautograde-service
       entryPoints:
         - web
 
+
   services:
-    minio-service:
+    keycloak-service:
       loadBalancer:
         servers:
-          - url: "http://172.16.8.212:9000"
-    minioconsole-service:
-      loadBalancer:
-        servers:
-          - url: "http://172.16.8.212:9001"
+          - url: "http://172.16.8.212:9090"
     traefikautograde-service:
       loadBalancer:
         servers:
           - url: "http://172.16.8.211:8081"
-    exams-service:
+    rabbitmq-gui-service:
       loadBalancer:
         servers:
-          - url: "http://172.16.8.211:80"
-    auth-service:
+          - url: "http://172.16.8.210:15672"
+    front-service:
       loadBalancer:
         servers:
-          - url: "http://172.16.8.212:9090"
-    go-worker-evaluation:
+          - url: "http://172.16.8.211:8089"
+    go-worker-evaluation-service:
       loadBalancer:
         servers:
           - url: "http://172.16.8.210:8082"
-    estudiantes-es:
+    estudiantes-service:
       loadBalancer:
         servers:
           - url: "http://172.16.8.210:8085"
-    docentes-es:
+    docentes-service:
       loadBalancer:
         servers:
           - url: "http://172.16.8.210:8084"
-    auth-us:
+    auth-utility-service:
       loadBalancer:
         servers:
           - url: "http://172.16.8.210:8083"
-    apievaluacion:
+    apievaluacion-service:
       loadBalancer:
         servers:
           - url: "http://172.16.8.210:5000"
